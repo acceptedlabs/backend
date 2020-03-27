@@ -2,19 +2,17 @@ const HttpError = require('../errors/http-error')
 const User = require('../models/user.model')
 const jwt = require('jsonwebtoken')
 
+const checkIfOnboarded = async (req, res, next) => {
+	const exists = await User.exists({ _id: req.user.sub })
+	res.send(exists)
+}
+
+
 const onboard = async (req, res, next) => {
-	//get the token from the headers
-	const authHeader = req.headers['authorization']
-	const token = authHeader && authHeader.split(' ')[1]
+	// get user ID
+	const userID = req.user.sub
 
-	if (!token)
-		return res.status(401).json({ msg: 'No token, authorizaton denied' })
-
-	const auth_id = jwt.decode(token).sub
-
-	//get data from the body
-	const { is_onboarded, onboardingInfo } = req.body
-
+	// get data from the body
 	const {
 		name,
 		mentorMentee,
@@ -23,32 +21,31 @@ const onboard = async (req, res, next) => {
 		gradYear,
 		race,
 		gender,
-		finAid,
+		finaid,
 		schoolTypes,
-	} = onboardingInfo
+	} = req.body
 
 	//check if user already exist
 	let existingUser
 	try {
-		existingUser = await User.findOne({ auth_id: auth_id })
+		existingUser = await User.findOne({ _id: userID })
 	} catch (err) {
 		return next(
-			new HttpError('Signing up failed, please try again later', 500),
+			new HttpError('Onboarding failed, please try again later', 500),
 		)
 	}
 
 	if (existingUser) {
 		return next(
 			new HttpError(
-				'User already existed, please try sign in instead',
+				'User has already been onboarded.',
 				422,
 			),
 		)
 	}
 
 	const createdUser = new User({
-		auth_id,
-		is_onboarded,
+		_id: userID,
 		onboardingInfo: {
 			name,
 			mentorMentee,
@@ -57,7 +54,7 @@ const onboard = async (req, res, next) => {
 			gradYear,
 			race,
 			gender,
-			finAid,
+			finaid,
 			schoolTypes,
 		},
 		posts: [],
@@ -69,7 +66,7 @@ const onboard = async (req, res, next) => {
 	} catch (err) {
 		console.log(err)
 		return next(
-			new HttpError('Signing up failed, please try again later', 500),
+			new HttpError('Onboarding failed, please try again later', 500),
 		)
 	}
 
@@ -78,4 +75,4 @@ const onboard = async (req, res, next) => {
 	})
 }
 
-exports.onboard = onboard
+module.exports = {onboard, checkIfOnboarded}

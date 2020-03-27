@@ -22,8 +22,10 @@ app.use(function(err, req, res, next) {
 app.use('/forum', forumRoutes)
 app.use('/user', userRoutes)
 
+const connectionStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_DOMAIN}/${process.env.MONGO_DB}?retryWrites=true&w=majority`
+
 //connect mongo
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(connectionStr, {
 	useNewUrlParser: true,
 	useCreateIndex: true,
 	useUnifiedTopology: true,

@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({
-	auth_id: { type: String, required: true },
-	is_onboarded: { type: Boolean, required: true },
+	_id: { type: String, required: true },
 	onboardingInfo: {
 		name: { type: String, required: true },
 		mentorMentee: { type: String, required: true },
@@ -12,7 +11,7 @@ const userSchema = new Schema({
 		gradYear: { type: Number, required: true },
 		race: { type: String, required: true },
 		gender: { type: String, required: true },
-		finAid: { type: String, required: true },
+		finaid: { type: String, required: true },
 		schoolTypes: {
 			ivy: { type: Boolean, required: true },
 			stateFlagships: { type: Boolean, required: true },
