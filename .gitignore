@@ -1,3 +1,9 @@
+# IDE support
+.idea
+
+# macOS flotsam
+.DS_Store
+
 # Logs
 logs
 *.log
@@ -105,3 +111,6 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+# Environment variables
+.env
