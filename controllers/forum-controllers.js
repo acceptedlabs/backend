@@ -50,24 +50,13 @@ const getRepliesByPostId = async (req, res, next) => {
 }
 
 const newPost = async (req, res, next) => {
-	const { title, text, user } = req.body
-
-	const createdPost = new Post({
-		title,
-		text,
-		datetime: new Date(),
-		replies: [],
-		user,
-		votes: {
-			upvotes: 0,
-			downvotes: 0,
-		},
-	})
+	const userID = req.user.sub
+	const { title, text } = req.body
 
 	//check if the user making the post exist
 	let existingUser
 	try {
-		existingUser = await User.findById(user)
+		existingUser = await User.findById(userID)
 	} catch (err) {
 		return next(
 			new HttpError('Create new post failed, please try again', 500),
@@ -80,6 +69,19 @@ const newPost = async (req, res, next) => {
 		)
 	}
 
+
+	const createdPost = new Post({
+		title,
+		text,
+		datetime: new Date(),
+		replies: [],
+		user: existingUser.id,
+		votes: {
+			upvotes: 0,
+			downvotes: 0,
+		},
+	})
+
 	try {
 		const sess = await mongoose.startSession()
 		sess.startTransaction()
@@ -88,6 +90,7 @@ const newPost = async (req, res, next) => {
 		await existingUser.save()
 		await sess.commitTransaction({ session: sess })
 	} catch (err) {
+		console.error(err)
 		return next(
 			new HttpError('Create new post failed, please try again', 500),
 		)

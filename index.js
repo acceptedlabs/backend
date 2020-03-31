@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
-const forumRoutes = require('./routes/forums-routes')
+const forumRoutes = require('./routes/forum-routes')
 const userRoutes = require('./routes/users-routes')
 
 const app = express()

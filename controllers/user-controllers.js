@@ -1,6 +1,5 @@
 const HttpError = require('../errors/http-error')
 const User = require('../models/user.model')
-const jwt = require('jsonwebtoken')
 
 const checkIfOnboarded = async (req, res, next) => {
 	const exists = await User.exists({ _id: req.user.sub })
