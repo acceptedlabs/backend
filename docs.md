@@ -39,7 +39,7 @@
 | Key          | Value                       |
 |--------------|-----------------------------|
 | `_id`        | `ObjectId` (set by Mongo)   |
-| `parentPost` | `Reply`    (ref)            |
+| `parentPost` | `Post`    (ref)             |
 | `replies`    | `[Reply]`  (ref, optional)  |
 | `body`       | `String`                    |
 | `upvotes`    | `[User]`  (ref)             |

@@ -1,38 +1,36 @@
 require('dotenv').config()
-const express = require('express')
-const cors = require('cors')
-const mongoose = require('mongoose')
-const forumRoutes = require('./routes/forum-routes')
-const userRoutes = require('./routes/users-routes')
+const { GraphQLServer } = require('graphql-yoga')
 
-const app = express()
+const { connect, models } = require('./db')
+const validateToken = require('./auth-client')
+const db = connect()
 
-app.use(cors())
-app.use(express.json())
-app.use(function(err, req, res, next) {
-	if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-		res.status(400).send({
-			status: 400,
-			error: 'Error: Bad request body',
-		})
-	} else next()
+const resolvers = require('./graphql/resolvers')
+const permissions = require('./graphql/shield')
+
+const context = async req => {
+	var parsedToken = null
+
+	if (req.request.headers && req.request.headers.authorization) {
+		const { authorization: token } = req.request.headers
+		parsedToken = token ? (await validateToken(token)).decoded : null
+	}
+
+	return {
+		models,
+		db,
+		user: parsedToken
+	}
+}
+
+const server = new GraphQLServer({
+	typeDefs: './graphql/schema.graphql',
+	resolvers,
+	context,
+	middlewares: [permissions],
 })
-
-//handle routing
-app.use('/forum', forumRoutes)
-app.use('/user', userRoutes)
-
-const connectionStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_DOMAIN}/${process.env.MONGO_DB}?retryWrites=true&w=majority`
-
-//connect mongo
-mongoose.connect(connectionStr, {
-	useNewUrlParser: true,
-	useCreateIndex: true,
-	useUnifiedTopology: true,
-})
-const connection = mongoose.connection
-connection.once('open', () => console.log('Mongo connected'))
-
-const port = process.env.PORT || 5000
-
-app.listen(port, () => console.log(`Listening on port ${port}`))
+server.start({
+	port: 4000,
+},
+	() => console.log(`Server is running on http://localhost:4000`)
+)
