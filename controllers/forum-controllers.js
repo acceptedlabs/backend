@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const User = require('../models/user.model')
 const Post = require('../models/post.model')
-const Replies = require('../models/replies.model')
+const Replies = require('../models/reply.model')
 const HttpError = require('../errors/http-error')
 
 const getPostById = async (req, res, next) => {
@@ -51,9 +51,9 @@ const getRepliesByPostId = async (req, res, next) => {
 
 const newPost = async (req, res, next) => {
 	const userID = req.user.sub
-	const { title, text } = req.body
+	const { title, body, tag } = req.body
 
-	//check if the user making the post exist
+	// check if the user making the post exists
 	let existingUser
 	try {
 		existingUser = await User.findById(userID)
@@ -65,21 +65,20 @@ const newPost = async (req, res, next) => {
 
 	if (!existingUser) {
 		return next(
-			new HttpError('Could not find the user for the provided id', 404),
+			new HttpError('Could not find the user for the provided id', 400),
 		)
 	}
 
 
 	const createdPost = new Post({
 		title,
-		text,
+		body,
 		datetime: new Date(),
 		replies: [],
+		upvotes: [],
+		downvotes: [],
+		tag,
 		user: existingUser.id,
-		votes: {
-			upvotes: 0,
-			downvotes: 0,
-		},
 	})
 
 	try {
