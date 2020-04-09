@@ -10,16 +10,20 @@ const permissions = require('./graphql/shield')
 
 const context = async req => {
 	var parsedToken = null
+	let tokenError
 
 	if (req.request.headers && req.request.headers.authorization) {
 		const { authorization: token } = req.request.headers
-		parsedToken = token ? (await validateToken(token)).decoded : null
+		const validation = await validateToken(token)
+		tokenError = validation.error ? validation.error.name : null
+		parsedToken = token ? (validation).decoded : null
 	}
 
 	return {
 		models,
 		db,
-		user: parsedToken
+		tokenError,
+		user: parsedToken,
 	}
 }
 
@@ -32,5 +36,5 @@ const server = new GraphQLServer({
 server.start({
 	port: 4000,
 },
-	() => console.log(`Server is running on http://localhost:4000`)
+() => console.log('Server is running on http://localhost:4000'),
 )

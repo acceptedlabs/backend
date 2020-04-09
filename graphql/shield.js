@@ -3,23 +3,30 @@ const { rule, shield, allow } = require('graphql-shield')
 
 const isAuthenticated = rule({ cache: 'contextual' })(
 	async (parent, args, ctx, info) => {
-		if (ctx.user === null) return new Error('401: Unauthorized')
-		else return true
+		if (ctx.tokenError) {
+			if (ctx.tokenError === 'JsonWebTokenError') return new Error('401-TokenMalformed')
+			if (ctx.tokenError === 'TokenExpiredError') return new Error('401-TokenExpired')
+		}
+		if (ctx.user == null || !ctx.user.sub) return new Error('401-AuthNeeded')
+		return true
 	},
 )
 
 const permissions = shield({
 	Query: {
-		curUser: isAuthenticated,
 		posts: allow,
+		postById: allow,
 		isOnboarded: isAuthenticated,
+		curUser: isAuthenticated,
 	},
 	Mutation: {
-		forumPost: isAuthenticated,
 		onboard: isAuthenticated,
+		forumPost: isAuthenticated,
 		votePost: isAuthenticated,
+		voteReply: isAuthenticated,
+		replyToPost: isAuthenticated,
+		replyToReply: isAuthenticated,
 	},
-	Post: isAuthenticated,
 }, {
 	debug: true,
 })

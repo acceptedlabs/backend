@@ -1,118 +1,753 @@
-# Accepted: Backend Docs
+# GraphQL Schema Docs
+*Generated using `graphql-markdown`.*
 
-## Schemas
-*Note*: All values are required unless explicitly specified.
+<details>
+  <summary><strong>Table of Contents</strong></summary>
 
-### Post 
-| Key          | Value                     |
-|--------------|---------------------------|
-| `_id`        | `ObjectId` (set by Mongo) |
-| `title`      | `String`                  |
-| `body`       | `String`                  |  
-| `datetime`   | `Date`                    |
-| `replies`    | `[Reply]` (ref)           |
-| `upvotes`    | `[User]`  (ref)           |
-| `downvotes`  | `[User]`  (ref)           |
-| `tag`        | `String`                  |
-| `user`       | `User`    (ref)           |
+  * [Query](#query)
+  * [Mutation](#mutation)
+  * [Objects](#objects)
+    * [OnboardingInfo](#onboardinginfo)
+    * [Post](#post)
+    * [Reply](#reply)
+    * [User](#user)
+  * [Inputs](#inputs)
+    * [OnboardingInput](#onboardinginput)
+  * [Scalars](#scalars)
+    * [Boolean](#boolean)
+    * [ID](#id)
+    * [Int](#int)
+    * [String](#string)
 
-### User
-| Key                                         | Value                    |
-|---------------------------------------------|--------------------------|
-| `_id`                                       | `String` (custom)        |
-| `onboardingInfo.name`                       | `String`                 |
-| `onboardingInfo.mentorMentee`               | `String`                 |  
-| `onboardingInfo.fieldStudy`                 | `Date`                   |
-| `onboardingInfo.intendedMajor`              | `String`                 |
-| `onboardingInfo.gradYear`                   | `Number`                 |
-| `onboardingInfo.race`                       | `String`                 |
-| `onboardingInfo.gender`                     | `String`                 |
-| `onboardingInfo.finaid`                     | `String`                 |
-| `onboardingInfo.schoolTypes.ivy`            | `String`                 |
-| `onboardingInfo.schoolTypes.stateFlagships` | `String`                 |
-| `onboardingInfo.schoolTypes.otherState`     | `String`                 |
-| `onboardingInfo.schoolTypes.otherPrivate`   | `String`                 |
-| `posts`                                     | `Post`   (ref)           |
-| `replies`                                   | `Reply`  (ref)           |
+</details>
+
+## Query
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>posts</strong></td>
+<td valign="top">[<a href="#post">Post</a>]!</td>
+<td>
+
+ Displays all posts in the forum. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postById</strong></td>
+<td valign="top"><a href="#post">Post</a></td>
+<td>
+
+ Returns a post by ID. If not found, returns null. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ The ID of the post to search for. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isOnboarded</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ **[Auth Needed]** Returns whether or not the user is onboarded. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>curUser</strong></td>
+<td valign="top"><a href="#user">User</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+## Mutation
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>onboard</strong></td>
+<td valign="top"><a href="#user">User</a>!</td>
+<td>
+
+ **[Auth Needed]** Onboard the user with the given information. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">info</td>
+<td valign="top"><a href="#onboardinginput">OnboardingInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>forumPost</strong></td>
+<td valign="top"><a href="#post">Post</a>!</td>
+<td>
+
+ **[Auth Needed]** Post to the forum. Returns the created Post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">title</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The title for the post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">body</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The body for the post, in Markdown. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">tag</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The tag for the post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>votePost</strong></td>
+<td valign="top"><a href="#post">Post</a>!</td>
+<td>
+
+ **[Auth Needed]** Vote on a forum post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ The ID of the post to vote on. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">downvote</td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not to downvote the post. If `false`, will upvote the post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>voteReply</strong></td>
+<td valign="top"><a href="#post">Post</a>!</td>
+<td>
+
+ **[Auth Needed]** Vote on a forum reply. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ The ID of the reply to vote on. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">downvote</td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not to downvote the reply. If `false`, will upvote the reply. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>replyToPost</strong></td>
+<td valign="top"><a href="#reply">Reply</a>!</td>
+<td>
+
+ **[Auth Needed]** Create a top-level reply to a forum post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ The ID of the post to reply to. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">body</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The body for the reply, in Markdown. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>replyToReply</strong></td>
+<td valign="top"><a href="#reply">Reply</a>!</td>
+<td>
+
+ **[Auth Needed]** Create a nested reply to a forum reply. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ The ID of the reply to reply to. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">body</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The body for the reply, in Markdown. 
+
+</td>
+</tr>
+</tbody>
+</table>
+
+## Objects
+
+### OnboardingInfo
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's first name. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mentorMentee</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ Mentor or mentee status of the user. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>fieldStudy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's general field of study. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>intendedMajor</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's intended major. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>gradYear</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+ The user's graduation year from their current program. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>race</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's racial identity. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>gender</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's gender identity. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>finaid</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply for financial aid. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyIvy</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to the Ivy League. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyStateFlagships</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to state flagships. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyOtherState</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to other state schools. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyOtherPrivate</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to other private schools. 
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### Post
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ The autogenerated Mongo ID of the post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>title</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user-supplied post title. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>body</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The Markdown body of the post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>datetime</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The UTC Unix timestamp of the post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>replies</strong></td>
+<td valign="top">[<a href="#reply">Reply</a>]!</td>
+<td>
+
+ A list of replies to this specific post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>upvotes</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+ The number of upvotes on this post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>downvotes</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+ The number of downvotes on this post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>tag</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The tag categorization of this post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>user</strong></td>
+<td valign="top"><a href="#user">User</a></td>
+<td>
+
+ The user that created this post. Can be `null` if the user doesn't exist anymore. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>myVote</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+**[Auth Optional]** The user's vote for this post.
+Returns null if unauthenticated or not voted on.
+Otherwise, returns -1 if downvoted, 1 if upvoted.
+
+</td>
+</tr>
+</tbody>
+</table>
 
 ### Reply
-| Key          | Value                       |
-|--------------|-----------------------------|
-| `_id`        | `ObjectId` (set by Mongo)   |
-| `parentPost` | `Post`    (ref)             |
-| `replies`    | `[Reply]`  (ref, optional)  |
-| `body`       | `String`                    |
-| `upvotes`    | `[User]`  (ref)             |
-| `downvotes`  | `[User]`  (ref)             |
-| `user`       | `User`    (ref)             |
 
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
 
-## Actions
+ The autogenerated Mongo ID of the reply. 
 
-### Forum
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>datetime</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
 
-#### `POST /forum`
-##### Description
-Makes a new forum post.
-Datetime is set to the time the request was processed.
-Upvotes and downvotes are initially zero.
-##### Body (JSON)
-```javascript
-{
-    title: String,
-    text: String,   // markdown
-    tag: String,
-}
-```
-##### Headers
-- Authorization: `Bearer $JWT`
-##### Return Status
-| HTTP Status | Reason                                     |
-|-------------|--------------------------------------------|
-| `201`       | Post created                               |
-| `400`       | No token or missing item from request body |
-| `500`       | Uncaught error in the server.              |
+ The UTC Unix timestamp of the post. 
 
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>replies</strong></td>
+<td valign="top">[<a href="#reply">Reply</a>]!</td>
+<td>
 
-#### `GET /forum/:id`
-##### Description
-Gets a forum post by ID.
-##### Body (JSON)
-*No body needed*
-##### Headers
-- Authorization: `Bearer $JWT`
-##### Return Body
-```javascript
-// TODO: document this
-```
-##### Return Status
-| HTTP Status | Reason                                     |
-|-------------|--------------------------------------------|
-| `200`       | Post found; post returned in body          |
-| `400`       | No token found                             |
-| `404`       | No post exists with that ID                |
-| `500`       | Uncaught error in the server.              |
+ Children replies for this reply. 
 
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>body</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
 
-GET /forum/:id/replies
-	- return a forum post's replies
-	- no request body needed
-	- Headers
-		Authorization: `Bearer $JWT`
-	- Returns
-		HTTP 200 & replies as JSON if post exists
-		HTTP 400 if no token
-		HTTP 404 if no such post exists
-		HTTP 500 for all other uncaught errors
+ The Markdown body of the post. 
 
-POST /forum/:id/votes
-	- upvote or downvote a post (a user should be able to do this only once per post)
-	- JSON request body: contains the following
-		- direction: Number (1 or -1, representing an upvote or downvote)
-	- Returns
-		HTTP 200 if vote cast successfully
-		HTTP 400 if no token
-		HTTP 404 if no such post exists
-		HTTP 500 for all other uncaught errors
-	- Headers
-		Authorization: `Bearer $JWT`
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>upvotes</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+ The number of upvotes on this post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>downvotes</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+ The number of downvotes on this post. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>user</strong></td>
+<td valign="top"><a href="#user">User</a></td>
+<td>
+
+ The user that created this post. Can be `null` if the user doesn't exist anymore. 
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### User
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ The Auth0-generated ID for the user. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onboardingInfo</strong></td>
+<td valign="top"><a href="#onboardinginfo">OnboardingInfo</a></td>
+<td>
+
+ The user's onboarding data. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>posts</strong></td>
+<td valign="top">[<a href="#post">Post</a>]!</td>
+<td>
+
+ The user's post history. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>replies</strong></td>
+<td valign="top">[<a href="#reply">Reply</a>]!</td>
+<td>
+
+ The user's reply history. 
+
+</td>
+</tr>
+</tbody>
+</table>
+
+## Inputs
+
+### OnboardingInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's first name. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mentorMentee</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ Mentor or mentee status of the user. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>fieldStudy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's general field of study. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>intendedMajor</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's intended major. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>gradYear</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+ The user's graduation year from their current program. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>race</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's racial identity. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>gender</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+ The user's gender identity. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>finaid</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply for financial aid. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyIvy</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to the Ivy League. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyStateFlagships</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to state flagships. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyOtherState</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to other state schools. 
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>applyOtherPrivate</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+ Whether or not the user will apply to other private schools. 
+
+</td>
+</tr>
+</tbody>
+</table>
+
+## Scalars
+
+### Boolean
+
+The `Boolean` scalar type represents `true` or `false`.
+
+### ID
+
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+
+### Int
+
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+### String
+
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+

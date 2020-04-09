@@ -39,6 +39,17 @@ const resolvers = {
 			return null
 		},
 	},
+	Reply: {
+		id: parent => parent._id,
+		datetime: parent => `${Math.floor(parent.datetime.getTime() / 1000)}`,
+		replies: async (parent, args, { models }) => {
+			return parent.replies.map(reply => models.Reply.findById(reply))
+		},
+		body: parent => parent.body,
+		upvotes: parent => parent.upvotes.length,
+		downvotes: parent => parent.downvotes.length,
+		user: async (parent, args, { models }) => await models.User.findById(parent.user),
+	},
 	User: {
 		id: parent => parent._id,
 		onboardingInfo: parent => ({
@@ -63,7 +74,9 @@ const resolvers = {
 		},
 	},
 	Mutation: {
-		forumPost: async (parent, args, { models }) => {
+		forumPost: async (parent, args, { models, user }) => {
+			const foundUser = await models.User.findById(user.sub)
+			if (!foundUser) return new Error('User doesn\'t exist.')
 			const newPost = new models.Post({
 				title: args.title,
 				body: args.body,
@@ -72,9 +85,11 @@ const resolvers = {
 				upvotes: [],
 				downvotes: [],
 				tag: args.tag,
-				user: null,
+				user: foundUser,
 			})
+			foundUser.posts.push(newPost)
 			await newPost.save()
+			await foundUser.save()
 			return newPost
 		},
 		onboard: async (parent, args, { models, user }) => {
@@ -123,6 +138,67 @@ const resolvers = {
 			}
 			await foundPost.save()
 			return foundPost
+		},
+		voteReply: async (parent, args, { models, user }) => {
+			const foundReply = await models.Reply.findById(args.id)
+			const foundUser = await models.User.findById(user.sub)
+			if (!foundReply) return new Error('No such reply found.')
+			if (!foundUser) return new Error('User doesn\'t exist.')
+			const alreadyUpvoted = foundReply.upvotes.some(vote => vote === foundUser.id)
+			const alreadyDownvoted = foundReply.downvotes.some(vote => vote === foundUser.id)
+			// If you've already done that action, then return the post and that's it
+			if ((alreadyUpvoted && !args.downvote) || (alreadyDownvoted && args.downvote)) return foundPost
+			else {
+				if (args.downvote) {
+					if (alreadyUpvoted) foundReply.upvotes.pull(foundUser)
+					foundReply.downvotes.push(foundUser)
+				} else {
+					if (alreadyDownvoted) foundReply.downvotes.pull(foundUser)
+					foundReply.upvotes.push(foundUser)
+				}
+			}
+			await foundReply.save()
+			return foundReply
+		},
+		replyToPost: async (parent, args, { models, user }) => {
+			const foundPost = await models.Post.findById(args.id)
+			const foundUser = await models.User.findById(user.sub)
+			if (!foundPost) return new Error('No such post found.')
+			if (!foundUser) return new Error('User doesn\'t exist.')
+			const newReply = new models.Reply({
+				datetime: new Date(),
+				replies: [],
+				body: args.body,
+				upvotes: [],
+				downvotes: [],
+				user: foundUser,
+			})
+			foundPost.replies.push(newReply)
+			foundUser.replies.push(newReply)
+			await newReply.save()
+			await foundPost.save()
+			await foundUser.save()
+			return newReply
+		},
+		replyToReply: async (parent, args, { models, user }) => {
+			const foundReply = await models.Reply.findById(args.id)
+			const foundUser = await models.User.findById(user.sub)
+			if (!foundReply) return new Error('No such reply found.')
+			if (!foundUser) return new Error('User doesn\'t exist.')
+			const newReply = new models.Reply({
+				datetime: new Date(),
+				replies: [],
+				body: args.body,
+				upvotes: [],
+				downvotes: [],
+				user: foundUser,
+			})
+			foundReply.replies.push(newReply)
+			foundUser.replies.push(newReply)
+			await newReply.save()
+			await foundReply.save()
+			await foundUser.save()
+			return newReply
 		},
 	},
 }
