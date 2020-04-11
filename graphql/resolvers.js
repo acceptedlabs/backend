@@ -1,10 +1,26 @@
 /* eslint-disable no-unused-vars */
+const aggregations = require('../db/aggregations')
+
 const resolvers = {
 	Query: {
 		posts: async (parent, args, { models }) => {
 			const posts = await models.Post.find({})
 			return posts
 		},
+
+		postsHotTen: async (parent, args, { models }) => {
+			const posts = await models.Post.aggregate(aggregations.hotnessPaginated(10, 0))
+			console.log(posts)
+			return posts
+		},
+
+		postsHot: async (parent, args, { models }) => {
+			const limit = args.limit && args.limit <= 50 ? args.limit : 10
+			const skip = limit * (args.page - 1)
+			const posts = await models.Post.aggregate(aggregations.hotnessPaginated(limit, skip))
+			return posts
+		},
+
 		postById: async (parent, args, { models }) => {
 			const post = await models.Post.findOne({ _id: args.id })
 			return post

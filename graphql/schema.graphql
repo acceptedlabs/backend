@@ -3,6 +3,12 @@ type Query {
 	""" Displays all posts in the forum. """
 	posts: [Post]!
 
+	""" Displays top 10 "Hot" posts, as determined by a version of the Reddit ranking algorithm. """
+	postsHotTen: [Post]!
+
+	""" Paginated version of `postsHotTen`. """
+	postsHot(page: Int!, limit: Int): [Post]!
+
 	""" Returns a post by ID. If not found, returns null. """
 	postById(
 		" The ID of the post to search for. "
