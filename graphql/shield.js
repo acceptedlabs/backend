@@ -28,7 +28,7 @@ const permissions = shield({
 		replyToReply: isAuthenticated,
 	},
 }, {
-	debug: true,
+	debug: process.env.NODE_ENV === 'development',
 })
   
 module.exports = permissions
