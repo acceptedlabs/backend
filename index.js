@@ -28,12 +28,12 @@ const context = async req => {
 }
 
 const server = new GraphQLServer({
-	typeDefs: './graphql/schema.graphql',
+	typeDefs: `${__dirname}/graphql/schema.graphql`,
 	resolvers,
 	context,
 	middlewares: [permissions],
 })
-server.start({
+const express = server.start({
 	port: process.env.PORT || 5000,
 },
 ({ port}) => {
@@ -42,3 +42,5 @@ server.start({
 	console.log(`Server is running on :${port}.`)
 },
 )
+
+module.exports = express
