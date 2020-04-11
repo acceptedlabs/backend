@@ -18,6 +18,8 @@ const permissions = shield({
 		postById: allow,
 		isOnboarded: isAuthenticated,
 		curUser: isAuthenticated,
+		postsHotTen: allow,
+		postsHot: allow,
 	},
 	Mutation: {
 		onboard: isAuthenticated,
