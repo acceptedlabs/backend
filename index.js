@@ -35,8 +35,9 @@ const server = new GraphQLServer({
 })
 const express = server.start({
 	port: process.env.PORT || 5000,
+	tracing: process.env.NODE_ENV !== 'production',
 },
-({ port}) => {
+({ port }) => {
 	const env = process.env.NODE_ENV === 'production' ? 'prod' : 'dev'
 	console.log(`Running ${env} version.`)
 	console.log(`Server is running on :${port}.`)
