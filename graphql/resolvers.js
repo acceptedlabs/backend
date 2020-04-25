@@ -10,7 +10,6 @@ const resolvers = {
 
 		postsHotTen: async (_parent, _args, { models: { Post } }) => {
 			const posts = await Post.aggregate(aggregations.hotnessPaginated(10, 0))
-			console.log(posts)
 			return posts
 		},
 
@@ -33,6 +32,17 @@ const resolvers = {
 			const foundUser = await User.findOne({ _id: user.sub })
 			return foundUser
 		},
+		getChatMessagesPaginated: async (_parent, args, { models: { Chat, User } }) => {
+			const now = Date.now()
+			const foundChat = await Chat.findById(args.id).lean()
+			if (!foundChat) return new Error('Chat doesn\'t exist.')
+			return foundChat.messages
+		},
+		getChatTopic: async (_parent, args, { models: { Chat } }) => {
+			const foundChat = await Chat.findById(args.id).lean()
+			if (!foundChat) return new Error('Chat doesn\'t exist.')
+			return foundChat.subject
+		}, 
 	},
 	Post: {
 		id: parent => parent._id,
@@ -96,6 +106,8 @@ const resolvers = {
 		replies: async (parent, _args, { models: { Reply } }) => {
 			return parent.replies.map(reply => Reply.findById(reply))
 		},
+		currentChats: async (parent, _args, { models: { Chat } }) => {
+			return parent.currentChats.map(chat => Chat.findById(chat))
 		},
 	},
 	Mutation: {
@@ -121,7 +133,7 @@ const resolvers = {
 			const { name, mentorMentee, fieldStudy, intendedMajor, gradYear, race, gender, finaid } = args.info
 			const exists = await User.exists({ _id: user.sub })
 			if (exists) return new Error('User has already been onboarded.')
-			const newUser = new models.User({
+			const newUser = new User({
 				_id: user.sub,
 				onboardingInfo: {
 					name,
@@ -224,6 +236,35 @@ const resolvers = {
 			await foundReply.save()
 			await foundUser.save()
 			return newReply
+		},
+		createChat: async (_parent, args, { models: { User, Chat }, user }) => {
+			const foundUser = await User.findById(user.sub)
+			if (!foundUser) return new Error('User doesn\'t exist.')
+			const newChat = new Chat({
+				users: [foundUser],
+				messages: [],
+				closed: false,
+				subject: args.subject,
+			})
+			foundUser.currentChats.push(newChat)
+			await newChat.save()
+			await foundUser.save()
+			return newChat
+		},
+		sendChatMessage: async (_parent, args, { models: { User, Chat }, user }) => {
+			const foundChat = await Chat.findById(args.id)
+			if (!foundChat) return new Error('Chat doesn\'t exist.')
+			const foundUser = await User.exists({ _id: user.sub })
+			if (!foundUser) return new Error('User doesn\'t exist.')
+			const isInChat = foundChat.users.some(usr => usr === user.sub)
+			if (!isInChat) return new Error('User isn\'t in this chat.')
+			foundChat.messages.push({
+				user: user.sub,
+				datetime: `${Math.floor(Date.now() / 1000)}`,
+				body: args.body,
+			})
+			await foundChat.save()
+			return foundChat
 		},
 	},
 }

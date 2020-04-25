@@ -28,6 +28,8 @@ const permissions = shield({
 		voteReply: isAuthenticated,
 		replyToPost: isAuthenticated,
 		replyToReply: isAuthenticated,
+		createChat: isAuthenticated,
+		sendChatMessage: isAuthenticated,
 	},
 }, {
 	debug: process.env.NODE_ENV === 'development',

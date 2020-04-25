@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
 	replies: [
 		{ type: mongoose.Types.ObjectId, required: true, ref: 'Reply' },
 	],
+	currentChats: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Chat' }],
 })
 
 module.exports = mongoose.model('User', userSchema)
