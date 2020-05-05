@@ -1,5 +1,4 @@
-const { pick } = require('../util')
-const { MongoError } = require('mongodb')
+const { pick, unixNow } = require('../util')
 
 let Mutation = {}
 
@@ -30,7 +29,7 @@ Mutation.createUser = async (_, { info }, { dataSources, user }) => {
 	} catch (err) {
 		console.log(err)
 		if (err instanceof MongoError && err.code === 11000) {
-			throw Error('User already exists.')
+			return new Error('User already exists.')
 		}
 	}
 	return null
@@ -38,11 +37,11 @@ Mutation.createUser = async (_, { info }, { dataSources, user }) => {
 
 Mutation.createPost = async (_, { title, body, tag }, { dataSources, user }) => {
 	const foundUser = await dataSources.users.findByAuth0ID(user.sub)
-	if (!foundUser) throw Error('User does not exist.')
+	if (!foundUser) return new Error('User does not exist.')
 	const newPost = {
 		title,
 		body,
-		timestamp: Math.floor(new Date().getTime() / 1000),
+		timestamp: unixNow(),
 		comments: [],
 		upvotes: [foundUser._id],
 		downvotes: [],
@@ -63,7 +62,7 @@ Mutation.vote = async (_, { id, objectType, direction }, { dataSources, user }) 
 	// TODO: make it possible to vote on comments too
 	if (objectType !== 'POST') return new Error('NotImplementedError')
 	const foundUser = await dataSources.users.findByAuth0ID(user.sub)
-	if (!foundUser) throw Error('User does not exist.') 
+	if (!foundUser) return new Error('User does not exist.')
 	const res = await dataSources.posts.vote(id, direction, foundUser._id)
 	return res
 }

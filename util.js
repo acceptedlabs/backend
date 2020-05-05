@@ -2,4 +2,8 @@ function pick(o, ...props) {
 	return Object.assign({}, ...props.map(prop => ({ [prop]: o[prop] })))
 }
 
-module.exports = { pick }
+function unixNow() {
+	return Math.floor(new Date().getTime() / 1000)
+}
+
+module.exports = { pick, unixNow }
