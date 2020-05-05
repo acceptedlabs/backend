@@ -52,12 +52,20 @@ Mutation.createPost = async (_, { title, body, tag }, { dataSources, user }) => 
 	try {
 		const res = await dataSources.posts.create(newPost)
 		if (!res.ops || !res.ops.length === 1) throw Error('Accepted Mongo validation error: Invalid ops variable')
-		console.log(res.ops)
 		return res.ops[0]
 	} catch (err) {
 		console.log(err)
 	}
 	return null
+}
+
+Mutation.vote = async (_, { id, objectType, direction }, { dataSources, user }) => {
+	// TODO: make it possible to vote on comments too
+	if (objectType !== 'POST') return new Error('NotImplementedError')
+	const foundUser = await dataSources.users.findByAuth0ID(user.sub)
+	if (!foundUser) throw Error('User does not exist.') 
+	const res = await dataSources.posts.vote(id, direction, foundUser._id)
+	return res
 }
 
 

@@ -102,8 +102,8 @@ type Query {
 type Mutation {
 	createUser(info: createUserInput!): User
 	createPost(title: String!, body: String!, tag: String!): Post!
-	vote(objectType: ForumObjectType!, direction: VoteDirection!): ForumObjectResult
-	reply(objectType: ForumObjectType!, body: String!): ForumObjectResult
+	vote(id: ID!, objectType: ForumObjectType!, direction: VoteDirection!): ForumObjectResult!
+	reply(id: ID!, objectType: ForumObjectType!, body: String!): ForumObjectResult!
 	createChat(ids: [ID]!, subject: String!): Chat
 	sendChatMessage(id: ID!, body: String!): ChatMessage
 }

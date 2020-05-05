@@ -1,6 +1,11 @@
+const { ObjectId } = require('mongodb')
 let Post = {}
 
-Post.id = (parent, _, __) => parent._id
+Post.id = (parent, _, __) => {
+	const pid = parent._id
+	if (pid instanceof ObjectId) return pid.toHexString()
+	else return pid
+}
 
 Post.upvotes = (parent, _, __) => parent.upvotes.length
 Post.downvotes = (parent, _, __) => parent.downvotes.length
@@ -13,6 +18,10 @@ Post.myVote = async (parent, _, { dataSources, user }) => {
 	if (parent.upvotes.map(x => JSON.stringify(x)).includes(id)) return 'UP'
 	else if (parent.downvotes.map(x => JSON.stringify(x)).includes(id)) return 'DOWN'
 	else return 'RESET'
+}
+
+Post.__isTypeOf = (obj, _, __) => {
+	return Object.prototype.hasOwnProperty.call(obj, 'tag')
 }
 
 module.exports = Post
