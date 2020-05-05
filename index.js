@@ -19,7 +19,10 @@ const client = new MongoClient('mongodb://localhost:27017/test', {
 client.connect()
 
 // ensure appropriate indices exist
-client.db().collection('users').createIndex({})
+client.db()
+	.collection('users')
+	.createIndex({ auth0ID: 1 }, { unique: true })
+	.then(() => console.log('Index ensured.'))
 
 const resolvers = require('./resolvers')
 

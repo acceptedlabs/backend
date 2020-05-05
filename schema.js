@@ -71,8 +71,8 @@ type Comment {
 	timestamp: String!
 	replies: [Comment]!
 	text: String!
-	upvotes: [User]!
-	downvotes: [User]!
+	upvotes: Int!
+	downvotes: Int!
 	author: User!
 }
 
@@ -82,10 +82,11 @@ type Post {
 	body: String!
 	timestamp: String!
 	comments: [Comment]!
-	upvotes: [User]!
-	downvotes: [User]!
+	upvotes: Int!
+	downvotes: Int!
 	author: User!
 	tag: String!
+	myVote: VoteDirection!
 }
 
 type Query {

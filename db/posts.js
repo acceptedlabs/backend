@@ -8,6 +8,9 @@ class Posts extends MongoDataSource {
 		res.close()
 		return next ? next : []
 	}
+	create(data) {
+		return this.collection.insertOne(data)
+	}
 }
 
 module.exports = Posts

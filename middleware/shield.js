@@ -28,6 +28,9 @@ const permissions = shield({
 		createChat: isAuthenticated,
 		sendChatMessage: isAuthenticated,
 	},
+	Post: {
+		myVote: isAuthenticated,
+	},
 }, {
 	debug: process.env.NODE_ENV === 'development',
 })
