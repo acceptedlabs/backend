@@ -69,7 +69,8 @@ enum Gender {
 type Comment {
 	id: ID!
 	timestamp: String!
-	replies: [Comment]!
+	comments: [Comment]!
+	parent: ID!
 	text: String!
 	upvotes: Int!
 	downvotes: Int!

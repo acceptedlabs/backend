@@ -1,4 +1,5 @@
 const { pick, unixNow } = require('../util')
+const { ObjectId, MongoError } = require('mongodb')
 
 let Mutation = {}
 
@@ -67,5 +68,26 @@ Mutation.vote = async (_, { id, objectType, direction }, { dataSources, user }) 
 	return res
 }
 
+Mutation.reply = async (_, { id, objectType, body }, { dataSources, user }) => {
+	// TODO: make it possible to reply to comments too
+	if (objectType !== 'POST') return new Error('NotImplementedError')
+	const foundUser = await dataSources.users.findByAuth0ID(user.sub)
+	if (!foundUser) return new Error('User does not exist.')
+	const foundPost = await dataSources.posts.findOneById(ObjectId(id))
+	if (!foundPost) return new Error('Post does not exist.')
+	const newComment = {
+		timestamp: unixNow(),
+		comments: [],
+		text: body,
+		parent: foundPost._id,
+		upvotes: [foundUser._id],
+		downvotes: [],
+		author: foundUser._id,
+	}
+	newComment._id = await dataSources.comments.create(newComment).insertedId
+	await dataSources.posts.addComment(foundPost._id, newComment._id)
+	foundPost.comments.push(newComment)
+	return foundPost
+}
 
 module.exports = Mutation
