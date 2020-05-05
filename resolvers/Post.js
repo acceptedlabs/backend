@@ -1,14 +1,14 @@
 const { ObjectId } = require('mongodb')
 let Post = {}
 
-Post.id = (parent, _, __) => {
+Post.id = (parent) => {
 	const pid = parent._id
 	if (pid instanceof ObjectId) return pid.toHexString()
 	else return pid
 }
 
-Post.upvotes = (parent, _, __) => parent.upvotes.length
-Post.downvotes = (parent, _, __) => parent.downvotes.length
+Post.upvotes = (parent) => parent.upvotes.length
+Post.downvotes = (parent) => parent.downvotes.length
 Post.author = (parent, _, { dataSources }) => dataSources.users.collection.findOneById(parent.author)
 
 Post.myVote = async (parent, _, { dataSources, user }) => {
@@ -20,7 +20,7 @@ Post.myVote = async (parent, _, { dataSources, user }) => {
 	else return 'RESET'
 }
 
-Post.__isTypeOf = (obj, _, __) => {
+Post.__isTypeOf = (obj) => {
 	return Object.prototype.hasOwnProperty.call(obj, 'tag')
 }
 

@@ -48,7 +48,7 @@ class Posts extends MongoDataSource {
 				if (isUpvoted) addOp('$pull', 'upvotes')
 				if (isDownvoted) addOp('$pull', 'downvotes')
 		}
-		const res = await Promise.all(ops)
+		await Promise.all(ops)
 		return post
 	}
 }
