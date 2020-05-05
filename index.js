@@ -13,6 +13,7 @@ const validateToken = require('./middleware/auth-client')
 const { MongoClient } = require('mongodb')
 const Users = require('./db/users')
 const Posts = require('./db/posts')
+const Comments = require('./db/comments')
 const client = new MongoClient('mongodb://localhost:27017/test', {
 	useUnifiedTopology: true,
 })
@@ -60,6 +61,7 @@ const server = new ApolloServer({
 		return {
 			users: new Users(client.db().collection('users')),
 			posts: new Posts(client.db().collection('posts')),
+			comments: new Comments(client.db().collection('comments')),
 		}
 	},
 })
