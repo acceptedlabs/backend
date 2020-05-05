@@ -14,25 +14,22 @@ const isAuthenticated = rule({ cache: 'contextual' })(
 
 const permissions = shield({
 	Query: {
-		posts: allow,
-		postById: allow,
+		hotPosts: allow,
+		post: isAuthenticated,
 		isOnboarded: isAuthenticated,
 		curUser: isAuthenticated,
-		postsHotTen: allow,
-		postsHot: allow,
+		chatMessages: isAuthenticated,
 	},
 	Mutation: {
-		onboard: isAuthenticated,
-		forumPost: isAuthenticated,
-		votePost: isAuthenticated,
-		voteReply: isAuthenticated,
-		replyToPost: isAuthenticated,
-		replyToReply: isAuthenticated,
+		createUser: isAuthenticated,
+		createPost: isAuthenticated,
+		vote: isAuthenticated,
+		reply: isAuthenticated,
 		createChat: isAuthenticated,
 		sendChatMessage: isAuthenticated,
 	},
 }, {
 	debug: process.env.NODE_ENV === 'development',
 })
-  
+
 module.exports = permissions

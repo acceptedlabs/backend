@@ -1,47 +1,74 @@
 require('dotenv').config()
-const { GraphQLServer } = require('graphql-yoga')
 
-const { connect, models } = require('./db')
-const validateToken = require('./auth-client')
-const db = connect()
+const express = require('express')
+const { ApolloServer } = require('apollo-server-express')
 
-const resolvers = require('./graphql/resolvers')
-const permissions = require('./graphql/shield')
+const typeDefs = require('./schema')
+const { applyMiddleware } = require('graphql-middleware')
+const { makeExecutableSchema } = require('graphql-tools')
+const shield = require('./middleware/shield')
+const validateToken = require('./middleware/auth-client')
 
-const context = async req => {
+
+const { MongoClient } = require('mongodb')
+const Users = require('./db/users')
+const Posts = require('./db/posts')
+const client = new MongoClient('mongodb://localhost:27017/test', {
+	useUnifiedTopology: true,
+})
+client.connect()
+
+// ensure appropriate indices exist
+client.db().collection('users').createIndex({})
+
+const resolvers = require('./resolvers')
+
+const schema = applyMiddleware(
+	makeExecutableSchema({
+		typeDefs,
+		resolvers,
+	}),
+	shield,
+)
+
+const context = async ({ req }) => {
 	var parsedToken = null
 	let tokenError
 
-	if (req.request.headers && req.request.headers.authorization) {
-		const { authorization: token } = req.request.headers
+
+	if (req.headers && (req.headers.authorization || req.headers.Authorization)) {
+		const token = req.headers.authorization || req.headers.Authorization
 		const validation = await validateToken(token)
 		tokenError = validation.error ? validation.error.name : null
 		parsedToken = token ? (validation).decoded : null
 	}
 
 	return {
-		models,
-		db,
 		tokenError,
 		user: parsedToken,
 	}
 }
 
-const server = new GraphQLServer({
-	typeDefs: `${__dirname}/graphql/schema.graphql`,
-	resolvers,
+const server = new ApolloServer({
 	context,
-	middlewares: [permissions],
+	schema,
+	dataSources: () => {
+		console.log('data source created')
+		return {
+			users: new Users(client.db().collection('users')),
+			posts: new Posts(client.db().collection('posts')),
+		}
+	},
 })
-const express = server.start({
-	port: process.env.PORT || 5000,
-	tracing: process.env.NODE_ENV !== 'production',
-},
-({ port }) => {
-	const env = process.env.NODE_ENV === 'production' ? 'prod' : 'dev'
-	console.log(`Running ${env} version.`)
-	console.log(`Server is running on :${port}.`)
-},
+
+const app = express()
+const morgan = require('morgan')
+app.use(morgan('dev'))
+server.applyMiddleware({ app })
+
+
+app.listen({ port: 4000 }, () =>
+	console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`),
 )
 
-module.exports = express
+module.exports = app
