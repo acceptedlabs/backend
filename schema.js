@@ -107,7 +107,7 @@ type Mutation {
 	vote(id: ID!, objectType: ForumObjectType!, direction: VoteDirection!): ForumObjectResult!
 	reply(id: ID!, objectType: ForumObjectType!, body: String!): ForumObjectResult!
 	createChat(ids: [ID]!, subject: String!): Chat!
-	sendChatMessage(id: ID!, body: String!): ChatMessage
+	sendChatMessage(id: ID!, body: String!): ChatMessage!
 }
 
 union ForumObjectResult = Comment | Post

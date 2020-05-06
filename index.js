@@ -64,6 +64,7 @@ const server = new ApolloServer({
 			posts: new Posts(client.db().collection('posts')),
 			comments: new Comments(client.db().collection('comments')),
 			chats: new Chats(client.db().collection('chats')),
+			messages: new Chats(client.db().collection('messages')),
 		}
 	},
 })

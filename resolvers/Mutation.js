@@ -107,4 +107,20 @@ Mutation.createChat = async (_, { ids, subject }, { dataSources, user }) => {
 	return newChat
 }
 
+Mutation.sendChatMessage = async (_, { id, body }, { dataSources, user }) => {
+	const foundUser = await dataSources.users.findByAuth0ID(user.sub)
+	if (!foundUser) return new Error('Current user does not exist.')
+	const foundChat = await dataSources.chats.findOneById(ObjectId(id))
+	if (!foundChat) return new Error('Chat does not exist.')
+	const newMessage = {
+		parentThread: foundChat._id,
+		author: foundUser._id,
+		timestamp: unixNow(),
+		text: body,
+	}
+	newMessage._id = await dataSources.messages.create(newMessage)
+	await dataSources.chats.addMessage(foundChat._id, newMessage._id)
+	return newMessage
+}
+
 module.exports = Mutation
