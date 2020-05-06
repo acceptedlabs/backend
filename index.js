@@ -14,6 +14,7 @@ const { MongoClient } = require('mongodb')
 const Users = require('./db/users')
 const Posts = require('./db/posts')
 const Comments = require('./db/comments')
+const Chats = require('./db/chats')
 const client = new MongoClient('mongodb://localhost:27017/test', {
 	useUnifiedTopology: true,
 })
@@ -62,6 +63,7 @@ const server = new ApolloServer({
 			users: new Users(client.db().collection('users')),
 			posts: new Posts(client.db().collection('posts')),
 			comments: new Comments(client.db().collection('comments')),
+			chats: new Chats(client.db().collection('chats')),
 		}
 	},
 })

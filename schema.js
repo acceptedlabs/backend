@@ -10,6 +10,7 @@ type Chat {
 }
 
 type ChatMessage {
+	parentThread: ID!
 	author: User!
 	timestamp: String!
 	text: String!
@@ -105,7 +106,7 @@ type Mutation {
 	createPost(title: String!, body: String!, tag: String!): Post!
 	vote(id: ID!, objectType: ForumObjectType!, direction: VoteDirection!): ForumObjectResult!
 	reply(id: ID!, objectType: ForumObjectType!, body: String!): ForumObjectResult!
-	createChat(ids: [ID]!, subject: String!): Chat
+	createChat(ids: [ID]!, subject: String!): Chat!
 	sendChatMessage(id: ID!, body: String!): ChatMessage
 }
 

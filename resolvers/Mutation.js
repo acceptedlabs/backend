@@ -90,4 +90,21 @@ Mutation.reply = async (_, { id, objectType, body }, { dataSources, user }) => {
 	return foundPost
 }
 
+Mutation.createChat = async (_, { ids, subject }, { dataSources, user }) => {
+	if (ids.length > 1) return new Error('NotSupportedError')
+	else if (ids.length === 0) return new Error('NotEnoughArgumentsError')
+	const foundUser = await dataSources.users.findByAuth0ID(user.sub)
+	if (!foundUser) return new Error('Current user does not exist.')
+	const otherFoundUser = await dataSources.users.findOneById(ObjectId(ids[0]))
+	if (!otherFoundUser) return new Error('Other user does not exist.')
+	const newChat = {
+		members: [foundUser._id, otherFoundUser._id],
+		messages: [],
+		closed: false,
+		subject,
+	}
+	newChat._id = await dataSources.chats.create(newChat).insertedId
+	return newChat
+}
+
 module.exports = Mutation
